@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgreskratos
+spec:
+  selector:
+    app: postgreskratos
+  ports:
+    - name: db
+      protocol: TCP
+      port: 5432
+      targetPort: 5432
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgreskratos
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgreskratos
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: postgreskratos
+    spec:
+      containers:
+        - image: postgres:9.6
+          name: postgreskratos
+          env:
+            - name: POSTGRES_USER
+              value: kratos
+            - name: POSTGRES_PASSWORD
+              value: secret
+            - name: POSTGRES_DB
+              value: kratos
+          ports:
+            - containerPort: 5432

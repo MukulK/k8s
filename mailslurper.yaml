@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mailslurper
+spec:
+  selector:
+    app: mailslurper
+  ports:
+    - name: ui
+      protocol: TCP
+      port: 4436
+      targetPort: 4436
+    - name: admin
+      protocol: TCP
+      port: 4437
+      targetPort: 4437
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mailslurper
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mailslurper
+  template:
+    metadata:
+      labels:
+        app: mailslurper
+    spec:
+      containers:
+        - name: mailslurper
+          image: oryd/mailslurper:latest-smtps
+          ports:
+            - containerPort: 4436
+            - containerPort: 4437
