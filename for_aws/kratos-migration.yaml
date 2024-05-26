@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kratos-migrate
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kratos-migrate
+  template:
+    metadata:
+      labels:
+        app: kratos-migrate
+    spec:
+      containers:
+        - name: kratos-migrate
+          image: oryd/kratos:v0.8.0-alpha.3
+          env:
+          - name: DSN
+            value: "postgres://kratos:secret@postgreskratos:5432/kratos?sslmode=disable&max_conns=20&max_idle_conns=4"
+          command:
+            - kratos
+            - migrate
+            - sql
+            - -c
+            - /etc/config/kratos.yml
+            - -e
+            - --yes
+          volumeMounts:
+            - name: kratos-config-volume
+              mountPath: /etc/config/kratos.yml
+              subPath: kratos.yml
+      volumes:
+        - name: kratos-config-volume
+          configMap:
+            name: kratos-config
